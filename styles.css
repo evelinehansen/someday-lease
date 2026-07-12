@@ -1,0 +1,379 @@
+/* styles.css — Someday Lease.
+   Shared family design tokens first, then this tool's components. */
+
+:root {
+  --bg: #FAFAF7;        --card: #FFFFFF;
+  --ink: #262A21;       --ink-soft: #6D7263;    --ink-faint: #9A9E90;
+  --sage: #647F5E;      --sage-deep: #4C6447;   --sage-tint: #ECF1E9;
+  --clay: #B96F4E;      --clay-deep: #97572F;   --clay-tint: #F7EBE3;
+  --line: #E7E5DA;      --track: #EDECE2;
+  --radius: 16px;
+  --shadow: 0 10px 30px rgba(44, 48, 36, 0.08);
+  --shadow-big: 0 24px 70px rgba(44, 48, 36, 0.18);
+  --spring: cubic-bezier(0.32, 1.3, 0.5, 1);
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+  --serif: ui-serif, Georgia, "Times New Roman", serif;
+}
+
+/* ---------- base ---------- */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+[hidden] { display: none !important; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.serif { font-family: var(--serif); font-weight: 600; }
+
+.app {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 7rem;
+}
+
+/* ---------- header ---------- */
+
+.app-name {
+  font-size: 0.78rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--ink-faint);
+}
+
+.carrying-line {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.4rem;
+  line-height: 1.35;
+  margin-top: 0.35rem;
+  max-width: 34ch;
+}
+
+/* ---------- section headings (small caps) ---------- */
+
+.section-h {
+  font-size: 0.78rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--ink-faint);
+}
+.section-h.clay { color: var(--clay-deep); }
+
+/* ---------- buttons ---------- */
+
+.btn {
+  font: inherit; font-weight: 600; font-size: 0.9rem;
+  color: var(--ink); background: var(--card);
+  border: 1px solid var(--line); border-radius: 999px;
+  padding: 0.5rem 1rem; min-height: 44px; cursor: pointer;
+  transition: background 0.2s, border-color 0.2s,
+              transform 0.25s var(--spring), box-shadow 0.25s;
+}
+.btn:hover { border-color: var(--ink-faint); }
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+
+.btn.primary { background: var(--sage); border-color: var(--sage); color: #FFFFFF; }
+.btn.primary:hover { background: var(--sage-deep); border-color: var(--sage-deep); }
+.btn.ghost { background: transparent; }
+.btn.danger { color: var(--clay-deep); border-color: var(--clay-tint); background: transparent; }
+.btn.danger:hover { background: var(--clay-tint); border-color: var(--clay); }
+.btn.small { font-size: 0.82rem; padding: 0.35rem 0.85rem; }
+.btn.block { display: block; width: 100%; margin-top: 1.25rem; }
+
+/* ---------- tabs ---------- */
+
+.tabs { display: flex; gap: 0.5rem; margin: 1.25rem 0 1rem; }
+.tab {
+  font: inherit; font-weight: 600; font-size: 0.88rem;
+  color: var(--ink-soft); background: transparent;
+  border: 1px solid var(--line); border-radius: 999px;
+  padding: 0.4rem 0.95rem; min-height: 44px; cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.tab:hover { border-color: var(--ink-faint); }
+.tab.active { background: var(--sage-tint); border-color: var(--sage-tint); color: var(--sage-deep); }
+
+/* ---------- cards and lists ---------- */
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.list { display: flex; flex-direction: column; gap: 0.65rem; }
+
+.item-card {
+  font: inherit; text-align: left; width: 100%;
+  display: flex; flex-direction: column; gap: 0.25rem;
+  color: var(--ink); /* buttons must set color explicitly (iOS Safari) */
+  padding: 0.85rem 1rem; min-height: 44px; cursor: pointer;
+  transition: border-color 0.2s, transform 0.25s var(--spring);
+}
+.item-card:hover { border-color: var(--ink-faint); }
+.item-card:active { transform: scale(0.985); }
+
+.item-title { font-family: var(--serif); font-weight: 600; font-size: 1.05rem; line-height: 1.35; }
+.item-meta { font-size: 0.84rem; color: var(--ink-soft); }
+.item-note {
+  font-size: 0.88rem; color: var(--ink-soft); font-style: italic;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+.chip {
+  display: inline-block; background: var(--track); color: var(--ink-soft);
+  border-radius: 999px; padding: 0.05rem 0.6rem;
+  font-size: 0.74rem; font-weight: 600; vertical-align: 1px; margin-left: 0.35rem;
+}
+
+.quiet-note { color: var(--ink-soft); font-size: 0.92rem; padding: 0.5rem 0.2rem; }
+.shelf-note { color: var(--ink-soft); font-size: 0.88rem; margin: 0.3rem 0 0.9rem; }
+
+/* ---------- the renewal band (clay: a knock on the door, never an alarm) ---------- */
+
+.renewal-band {
+  background: var(--clay-tint);
+  border-radius: var(--radius);
+  padding: 0.9rem 0.9rem 1rem;
+  margin-bottom: 1rem;
+}
+.band-note { font-size: 0.86rem; color: var(--ink-soft); margin: 0.15rem 0 0.75rem; }
+.renewal-band .item-card { box-shadow: none; }
+
+/* ---------- empty state ---------- */
+
+.empty-state { padding: 1rem 0.25rem 0; }
+.empty-state h2 {
+  font-family: var(--serif); font-weight: 600;
+  font-size: 1.5rem; line-height: 1.3; margin-bottom: 0.9rem; max-width: 24ch;
+}
+.empty-state p { color: var(--ink-soft); max-width: 42ch; margin-bottom: 0.45rem; }
+.empty-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; margin: 1.3rem 0 2rem; }
+
+.ghost-list { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 0.75rem; }
+.ghost-card {
+  border: 1.5px dashed var(--line); border-radius: var(--radius);
+  padding: 0.85rem 1rem; display: flex; flex-direction: column; gap: 0.2rem;
+}
+.ghost-card .item-title, .ghost-card .item-meta { color: var(--ink-faint); }
+
+/* ---------- backup bar and nudge ---------- */
+
+.backup-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 0.6rem;
+  border-top: 1px solid var(--line);
+  margin-top: 2.25rem; padding-top: 1rem;
+  font-size: 0.85rem; color: var(--ink-soft);
+}
+.backup-actions { display: flex; gap: 0.5rem; }
+
+.nudge {
+  margin-top: 1rem; padding: 0.9rem 1rem;
+  background: var(--sage-tint); border-color: var(--sage-tint); box-shadow: none;
+  display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; justify-content: space-between;
+}
+.nudge p { font-size: 0.88rem; color: var(--ink); max-width: 38ch; }
+
+/* ---------- floating add button ---------- */
+
+.add-fab {
+  position: fixed; z-index: 30;
+  right: 1rem; bottom: calc(1.1rem + env(safe-area-inset-bottom));
+  box-shadow: var(--shadow-big);
+  font-size: 0.95rem; padding: 0.7rem 1.3rem;
+}
+@media (min-width: 760px) {
+  /* keep the button visually attached to the centered column */
+  .add-fab { right: calc(50vw - 320px + 1rem); }
+}
+
+/* ---------- panel: side panel on desktop, bottom sheet on mobile ---------- */
+
+.backdrop {
+  position: fixed; inset: 0; z-index: 40;
+  background: rgba(38, 42, 33, 0.35);
+  opacity: 0; transition: opacity 0.25s;
+}
+.backdrop.show { opacity: 1; }
+
+.panel {
+  position: fixed; z-index: 50;
+  background: var(--card); box-shadow: var(--shadow-big);
+  display: flex; flex-direction: column;
+}
+.panel-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 0.75rem; padding: 1.25rem 1.25rem 0.75rem;
+}
+.panel-title { font-family: var(--serif); font-weight: 600; font-size: 1.3rem; line-height: 1.3; }
+.panel-close {
+  font-size: 1.5rem; line-height: 1; color: var(--ink-soft);
+  background: transparent; border: none; cursor: pointer;
+  min-width: 44px; min-height: 44px; border-radius: 999px; flex-shrink: 0;
+}
+.panel-close:hover { background: var(--track); }
+.panel-body { overflow-y: auto; padding: 0 1.25rem 1.5rem; flex: 1; }
+
+@media (min-width: 721px) {
+  .panel {
+    top: 0; right: 0; bottom: 0; width: min(420px, 92vw);
+    border-left: 1px solid var(--line);
+    transform: translateX(105%);
+    transition: transform 0.35s var(--spring);
+  }
+  .panel.open { transform: none; }
+}
+@media (max-width: 720px) {
+  .panel {
+    left: 0; right: 0; bottom: 0; max-height: 88vh;
+    border-radius: var(--radius) var(--radius) 0 0;
+    padding-bottom: env(safe-area-inset-bottom);
+    transform: translateY(105%);
+    transition: transform 0.35s var(--spring);
+  }
+  .panel.open { transform: none; }
+}
+
+/* ---------- forms ---------- */
+
+.form label, .field-label {
+  display: block;
+  font-size: 0.85rem; font-weight: 600; color: var(--ink-soft);
+  margin: 1rem 0 0.35rem;
+}
+.form label:first-child { margin-top: 0.25rem; }
+
+input[type="text"], input[type="number"], textarea {
+  font: inherit; font-size: 1rem; /* 16px stops iOS zooming on focus */
+  width: 100%;
+  border: 1px solid var(--line); border-radius: 10px;
+  padding: 0.6rem 0.7rem; background: var(--bg); color: var(--ink);
+}
+textarea { resize: vertical; }
+input:focus, textarea:focus {
+  outline: 2px solid var(--sage); outline-offset: 1px; border-color: var(--sage);
+}
+input[type="number"] { width: 5.5rem; }
+
+.term-picker { display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: center; }
+.term-pill {
+  font: inherit; font-weight: 600; font-size: 0.85rem;
+  color: var(--ink); background: var(--card);
+  border: 1px solid var(--line); border-radius: 999px;
+  padding: 0.4rem 0.9rem; min-height: 44px; cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.term-pill:hover { border-color: var(--ink-faint); }
+.term-pill.selected { background: var(--sage); border-color: var(--sage); color: #FFFFFF; }
+.custom-term { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; color: var(--ink-soft); }
+
+.lease-preview { font-size: 0.88rem; color: var(--sage-deep); margin-top: 0.75rem; min-height: 1.3em; }
+
+/* ---------- item detail: why, history, decisions ---------- */
+
+.lease-line { font-size: 0.9rem; color: var(--ink-soft); margin-bottom: 0.75rem; }
+
+.why-quote {
+  font-family: var(--serif); font-size: 1rem; line-height: 1.45;
+  border-left: 2px solid var(--line);
+  padding: 0.1rem 0 0.1rem 0.75rem;
+  margin: 0.4rem 0 1rem;
+}
+
+.history-entry { margin: 0.6rem 0 0.9rem; }
+.history-date { font-size: 0.8rem; font-weight: 600; color: var(--ink-soft); }
+.history-entry .why-quote { margin: 0.25rem 0 0.25rem; }
+.change-note { font-size: 0.85rem; color: var(--ink-soft); margin-top: 0.2rem; }
+
+.decisions { display: flex; flex-direction: column; gap: 0.55rem; margin-top: 0.5rem; }
+.decision-btn {
+  font: inherit; text-align: left; width: 100%;
+  color: var(--ink); background: var(--card);
+  border: 1px solid var(--line); border-radius: 12px;
+  padding: 0.75rem 1rem; min-height: 44px; cursor: pointer;
+  font-weight: 600; font-size: 0.95rem;
+  transition: background 0.2s, border-color 0.2s;
+}
+.decision-btn .sub { display: block; font-weight: 400; font-size: 0.82rem; color: var(--ink-soft); }
+.decision-btn:hover { border-color: var(--ink-faint); }
+.decision-btn.selected { background: var(--sage-tint); border-color: var(--sage); }
+.decision-btn.renew-btn { border-color: var(--sage); }
+
+.decision-form { margin-top: 1rem; padding-top: 0.25rem; border-top: 1px solid var(--line); }
+
+/* ---------- modal (import choice) ---------- */
+
+.modal-wrap {
+  position: fixed; inset: 0; z-index: 60;
+  background: rgba(38, 42, 33, 0.35);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.25rem;
+}
+.modal {
+  max-width: 380px; width: 100%;
+  padding: 1.25rem; box-shadow: var(--shadow-big);
+}
+.modal-title { font-family: var(--serif); font-weight: 600; font-size: 1.15rem; margin-bottom: 0.5rem; }
+.modal p { font-size: 0.92rem; color: var(--ink-soft); }
+.modal-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+
+/* ---------- toast ---------- */
+
+.toast {
+  position: fixed; z-index: 70;
+  left: 50%; bottom: calc(5.25rem + env(safe-area-inset-bottom));
+  transform: translateX(-50%) translateY(8px);
+  background: var(--ink); color: var(--bg);
+  border-radius: 999px; padding: 0.6rem 1.15rem;
+  font-size: 0.88rem; max-width: min(90vw, 26rem);
+  box-shadow: var(--shadow-big);
+  opacity: 0; transition: opacity 0.25s, transform 0.35s var(--spring);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ---------- the two signature animations ---------- */
+
+/* 1. Signing the lease: the new item seats itself into the list. */
+@keyframes seat-in {
+  0%   { opacity: 0; transform: translateY(18px) scale(0.96); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes seat-glow {
+  0%, 35% { background: var(--sage-tint); border-color: var(--sage); }
+  100%    { background: var(--card); border-color: var(--line); }
+}
+.seat-in { animation: seat-in 0.55s var(--spring), seat-glow 1.5s ease-out; }
+
+/* 2. A decision sends the item to its shelf. */
+@keyframes depart-acted {
+  to { opacity: 0; transform: translateX(48px) scale(0.92); }
+}
+.depart-acted {
+  background: var(--sage-tint); border-color: var(--sage);
+  animation: depart-acted 0.45s var(--spring) forwards;
+}
+@keyframes depart-released {
+  to { opacity: 0; transform: translateY(14px) scale(0.98); }
+}
+.depart-released { animation: depart-released 0.5s ease forwards; }
+
+@keyframes fade-in  { from { opacity: 0; } }
+@keyframes fade-out { to   { opacity: 0; } }
+
+/* Reduced motion: swap movement for a crossfade. */
+@media (prefers-reduced-motion: reduce) {
+  .seat-in { animation: fade-in 0.2s ease; }
+  .depart-acted, .depart-released { animation: fade-out 0.2s ease forwards; }
+  .panel { transition: opacity 0.2s; transform: none; opacity: 0; }
+  .panel.open { opacity: 1; }
+  .toast { transition: opacity 0.2s; transform: translateX(-50%); }
+  .toast.show { transform: translateX(-50%); }
+  .btn:active, .item-card:active { transform: none; }
+}

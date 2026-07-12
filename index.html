@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Someday Lease</title>
+  <meta name="description" content="A someday list where every item is on a lease. When it expires: renew it, act on it, or let it go.">
+  <!-- Empty favicon so the browser never requests one (zero network requests). -->
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div class="app-name">Someday Lease</div>
+      <h1 class="carrying-line" id="carryingLine" hidden></h1>
+    </header>
+
+    <nav class="tabs" id="tabs" aria-label="Views">
+      <button class="tab" data-view="active">Somedays</button>
+      <button class="tab" data-view="acted">Did it</button>
+      <button class="tab" data-view="released">Released</button>
+    </nav>
+
+    <main id="content"></main>
+
+    <footer class="backup-bar">
+      <span class="backup-age" id="backupAge"></span>
+      <span class="backup-actions">
+        <button class="btn small" id="exportBtn">Export backup</button>
+        <button class="btn small ghost" id="importBtn">Import</button>
+      </span>
+    </footer>
+  </div>
+
+  <input type="file" id="importFile" accept=".json,application/json" hidden>
+
+  <button class="btn primary add-fab" id="addBtn">Add a someday</button>
+
+  <div class="backdrop" id="backdrop" hidden></div>
+
+  <aside class="panel" id="panel" role="dialog" aria-modal="true" aria-labelledby="panelTitle" hidden>
+    <div class="panel-head">
+      <h2 class="panel-title" id="panelTitle"></h2>
+      <button class="panel-close" id="panelClose" aria-label="Close">&times;</button>
+    </div>
+    <div class="panel-body" id="panelBody"></div>
+  </aside>
+
+  <div class="modal-wrap" id="modalWrap" hidden>
+    <div class="modal card" id="modalCard" role="dialog" aria-modal="true"></div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <datalist id="categoryOptions"></datalist>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
