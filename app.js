@@ -3,7 +3,7 @@
 
 import {
   todayISO, daysBetween, newItem, renewItem, markActed, releaseItem, reLease,
-  isUpForRenewal, sortActive, carryingLine, timeLeftText, leaseSentence,
+  editItem, isUpForRenewal, sortActive, carryingLine, timeLeftText, leaseSentence,
   formatFullDate, formatMonthYear, renewalCountText, monthsWord,
 } from "./engine.js";
 import {
@@ -11,8 +11,9 @@ import {
 } from "./storage.js";
 
 let data = load();
-let view = "active";      // "active" | "acted" | "released"
-let seatInId = null;      // item that should play the seat-in animation on next render
+let view = "active";        // "active" | "acted" | "released"
+let seatInId = null;        // item that should play the seat-in animation on next render
+let filterCategory = null;  // null means all categories
 
 const $ = (sel) => document.querySelector(sel);
 const content = $("#content");
@@ -20,11 +21,18 @@ const panel = $("#panel");
 const panelBody = $("#panelBody");
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-// Escape user text before putting it into innerHTML.
+// Escape user text before putting it into innerHTML (quotes too, so the
+// same helper is safe inside attribute values like value="...").
 function esc(s) {
-  const div = document.createElement("div");
-  div.textContent = s ?? "";
-  return div.innerHTML;
+  return String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function matchesFilter(item) {
+  return !filterCategory || item.category === filterCategory;
 }
 
 function findItem(id) {
@@ -48,6 +56,13 @@ function render() {
     t.classList.toggle("active", t.dataset.view === view);
   });
 
+  const dueCount = data.items.filter((i) => isUpForRenewal(i, today)).length;
+  const badge = $("#dueBadge");
+  badge.hidden = dueCount === 0;
+  badge.textContent = dueCount;
+
+  renderFilterRow();
+
   $("#addBtn").hidden = view !== "active" || data.items.length === 0;
 
   if (view === "active") renderActiveView(today);
@@ -57,13 +72,34 @@ function render() {
   renderCategoryOptions();
 }
 
+function allCategories() {
+  return [...new Set(data.items.map((i) => i.category).filter(Boolean))].sort();
+}
+
+function renderFilterRow() {
+  const row = $("#filterRow");
+  const cats = allCategories();
+  if (filterCategory && !cats.includes(filterCategory)) filterCategory = null;
+  if (!cats.length) {
+    row.hidden = true;
+    row.innerHTML = "";
+    return;
+  }
+  row.hidden = false;
+  row.innerHTML =
+    `<button class="filter-chip ${!filterCategory ? "active" : ""}" data-cat="">All categories</button>` +
+    cats.map((c) =>
+      `<button class="filter-chip ${filterCategory === c ? "active" : ""}" data-cat="${esc(c)}">${esc(c)}</button>`
+    ).join("");
+}
+
 function renderActiveView(today) {
   if (data.items.length === 0) {
     content.innerHTML = emptyStateHTML();
     return;
   }
 
-  const active = sortActive(data.items, today);
+  const active = sortActive(data.items, today).filter(matchesFilter);
   const due = active.filter((i) => isUpForRenewal(i, today));
   const rest = active.filter((i) => !isUpForRenewal(i, today));
 
@@ -78,7 +114,9 @@ function renderActiveView(today) {
   if (rest.length) {
     html += `<section class="list">${rest.map((i) => activeCardHTML(i, today)).join("")}</section>`;
   } else if (!due.length) {
-    html += `<p class="quiet-note">No active somedays right now. The shelves keep the finished stories.</p>`;
+    html += `<p class="quiet-note">${filterCategory
+      ? "No somedays in this category right now."
+      : "No active somedays right now. The shelves keep the finished stories."}</p>`;
   }
   html += nudgeHTML();
   content.innerHTML = html;
@@ -99,17 +137,20 @@ function activeCardHTML(item, today) {
 }
 
 function renderShelfView(which) {
-  const items = data.items
+  const shelf = data.items
     .filter((i) => i.status === which)
     .sort((a, b) => (a.closedOn < b.closedOn ? 1 : -1));
+  const items = shelf.filter(matchesFilter);
 
   const heading = which === "acted" ? "Did it" : "Released";
   const note = which === "acted"
     ? "Somedays that became doing. Tap one for its story."
     : "Let go on purpose. Tap one to revisit, or lease it again.";
-  const empty = which === "acted"
-    ? "Nothing here yet. When a someday truly starts, it moves here with its story."
-    : "Nothing here yet. When you let a someday go, it rests here (and can always be leased again).";
+  const empty = shelf.length
+    ? "Nothing in this category on this shelf."
+    : which === "acted"
+      ? "Nothing here yet. When a someday truly starts, it moves here with its story."
+      : "Nothing here yet. When you let a someday go, it rests here (and can always be leased again).";
 
   let html = `<div class="section-h">${heading}</div>`;
   if (!items.length) {
@@ -206,13 +247,14 @@ function closePanel() {
 // ---------- lease term picker (3 / 6 / 12 / custom) ----------
 
 function termPickerHTML(selected = 6) {
+  const isPreset = [3, 6, 12].includes(selected);
   const pill = (m) =>
-    `<button type="button" class="term-pill ${m === selected ? "selected" : ""}" data-m="${m}">${m} months</button>`;
+    `<button type="button" class="term-pill ${isPreset && m === selected ? "selected" : ""}" data-m="${m}">${m} months</button>`;
   return `<div class="term-picker" data-months="${selected}">
     ${pill(3)}${pill(6)}${pill(12)}
-    <button type="button" class="term-pill" data-m="custom">Custom</button>
-    <span class="custom-term" hidden>
-      <input type="number" class="custom-months" min="1" max="36" value="9" aria-label="Custom lease length in months"> months
+    <button type="button" class="term-pill ${isPreset ? "" : "selected"}" data-m="custom">Custom</button>
+    <span class="custom-term" ${isPreset ? "hidden" : ""}>
+      <input type="number" class="custom-months" min="1" max="36" value="${isPreset ? 9 : selected}" aria-label="Custom lease length in months"> months
     </span>
   </div>`;
 }
@@ -348,7 +390,8 @@ function openActiveDetail(item) {
       <button class="decision-btn" data-decide="acted">I acted on it<span class="sub">move it to the did it shelf</span></button>
       <button class="decision-btn" data-decide="release">Let it go<span class="sub">rest it on the released shelf</span></button>
     </div>
-    <div id="decisionForm"></div>`);
+    <div id="decisionForm"></div>
+    ${housekeepingHTML()}`);
 
   panelBody.querySelectorAll("[data-decide]").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -356,6 +399,76 @@ function openActiveDetail(item) {
       renderDecisionForm(item, btn.dataset.decide);
     });
   });
+  wireHousekeeping(item);
+}
+
+// ---------- edit and delete (available on every item) ----------
+
+function housekeepingHTML() {
+  return `<div class="housekeeping">
+    <button class="btn small ghost" data-house="edit">Edit details</button>
+    <button class="btn small danger" data-house="delete">Delete forever</button>
+  </div>`;
+}
+
+function wireHousekeeping(item) {
+  panelBody.querySelector("[data-house='edit']")?.addEventListener("click", () => renderEditForm(item));
+  panelBody.querySelector("[data-house='delete']")?.addEventListener("click", () => openDeleteConfirm(item));
+}
+
+function renderEditForm(item) {
+  const holder = $("#decisionForm");
+  panelBody.querySelectorAll("[data-decide]").forEach((b) => b.classList.remove("selected"));
+  const showTerm = item.status === "active";
+  holder.innerHTML = `<form class="form decision-form" id="editForm">
+    <label for="eTitle">What is it?</label>
+    <input type="text" id="eTitle" required maxlength="120" value="${esc(item.title)}">
+    <label for="eWhy">Why does it matter?</label>
+    <textarea id="eWhy" rows="2" required maxlength="280">${esc(item.why)}</textarea>
+    <label for="eCat">Category (optional)</label>
+    <input type="text" id="eCat" list="categoryOptions" maxlength="40" value="${esc(item.category)}">
+    ${showTerm ? `<div class="field-label">Lease term</div>
+      ${termPickerHTML(item.leaseMonths)}
+      <p class="form-note">Changing the term re-dates the lease from its last signing.</p>` : ""}
+    <button type="submit" class="btn primary block">Save changes</button>
+  </form>`;
+  if (showTerm) wireTermPicker(holder);
+  $("#editForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const months = showTerm ? getPickedMonths(holder) : null;
+    if (showTerm && !months) return;
+    const title = $("#eTitle").value.trim();
+    const why = $("#eWhy").value.trim();
+    if (!title || !why) return;
+    replaceItem(editItem(item, { title, why, category: $("#eCat").value.trim(), months }));
+    save(data);
+    closePanel();
+    render();
+    showToast("Updated.");
+  });
+  holder.querySelector("input")?.focus();
+  holder.scrollIntoView({ behavior: reducedMotion.matches ? "auto" : "smooth", block: "nearest" });
+}
+
+function openDeleteConfirm(item) {
+  $("#modalCard").innerHTML = `
+    <div class="modal-title">Delete forever</div>
+    <p>"${esc(item.title)}" will be removed completely, along with its whole history.
+       There's no shelf for deleted items. This can't be undone.</p>
+    <div class="modal-actions">
+      <button class="btn danger" id="mDelete">Delete</button>
+      <button class="btn ghost" id="mCancel">Cancel</button>
+    </div>`;
+  $("#modalWrap").hidden = false;
+  $("#mDelete").addEventListener("click", () => {
+    data.items = data.items.filter((i) => i.id !== item.id);
+    save(data);
+    closeModal();
+    closePanel();
+    render();
+    showToast("Deleted.");
+  });
+  $("#mCancel").addEventListener("click", closeModal);
 }
 
 function renderDecisionForm(item, decision) {
@@ -450,7 +563,10 @@ function openActedDetail(item) {
     <div class="history-entry">
       <div class="history-date">Done ${formatFullDate(item.closedOn)}</div>
       ${item.closingNote ? `<blockquote class="why-quote">${esc(item.closingNote)}</blockquote>` : ""}
-    </div>`);
+    </div>
+    <div id="decisionForm"></div>
+    ${housekeepingHTML()}`);
+  wireHousekeeping(item);
 }
 
 function openReleasedDetail(item) {
@@ -466,7 +582,9 @@ function openReleasedDetail(item) {
     <div class="decisions">
       <button class="decision-btn renew-btn" data-decide="release">Lease it again<span class="sub">a new lease, its history intact</span></button>
     </div>
-    <div id="decisionForm"></div>`);
+    <div id="decisionForm"></div>
+    ${housekeepingHTML()}`);
+  wireHousekeeping(item);
 
   panelBody.querySelector("[data-decide='release']").addEventListener("click", (e) => {
     e.target.closest(".decision-btn").classList.add("selected");
@@ -581,6 +699,13 @@ $("#tabs").addEventListener("click", (e) => {
   const tab = e.target.closest(".tab");
   if (!tab) return;
   view = tab.dataset.view;
+  render();
+});
+
+$("#filterRow").addEventListener("click", (e) => {
+  const chip = e.target.closest(".filter-chip");
+  if (!chip) return;
+  filterCategory = chip.dataset.cat || null;
   render();
 });
 

@@ -12,25 +12,26 @@
 <body>
   <div class="app">
     <header class="app-header">
-      <div class="app-name">Someday Lease</div>
-      <h1 class="carrying-line" id="carryingLine" hidden></h1>
+      <div class="header-top">
+        <h1 class="app-title">Someday<span class="app-title-accent">Lease</span></h1>
+        <div class="backup-controls">
+          <span class="backup-age" id="backupAge"></span>
+          <button class="btn small" id="exportBtn">Export</button>
+          <button class="btn small" id="importBtn">Import</button>
+        </div>
+      </div>
+      <p class="carrying-line" id="carryingLine" hidden></p>
     </header>
 
     <nav class="tabs" id="tabs" aria-label="Views">
-      <button class="tab" data-view="active">Somedays</button>
+      <button class="tab" data-view="active">Somedays<span class="tab-badge" id="dueBadge" hidden></span></button>
       <button class="tab" data-view="acted">Did it</button>
       <button class="tab" data-view="released">Released</button>
     </nav>
 
-    <main id="content"></main>
+    <div class="filter-row" id="filterRow" hidden></div>
 
-    <footer class="backup-bar">
-      <span class="backup-age" id="backupAge"></span>
-      <span class="backup-actions">
-        <button class="btn small" id="exportBtn">Export backup</button>
-        <button class="btn small ghost" id="importBtn">Import</button>
-      </span>
-    </footer>
+    <main id="content"></main>
   </div>
 
   <input type="file" id="importFile" accept=".json,application/json" hidden>

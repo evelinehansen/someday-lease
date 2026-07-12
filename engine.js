@@ -92,6 +92,21 @@ export function releaseItem(item, note, today) {
   return { ...item, status: "released", closedOn: today, closingNote: note || "" };
 }
 
+// Fixing the words is allowed anytime. Changing the term of an active lease
+// re-dates it from its last signing (creation or most recent renewal), so the
+// lease stays honest about when it was actually agreed.
+export function editItem(item, { title, why, category, months }) {
+  const updated = { ...item, title, why, category: category || "" };
+  if (item.status === "active" && months && months !== item.leaseMonths) {
+    const signedOn = item.renewals.length
+      ? item.renewals[item.renewals.length - 1].on
+      : item.created.slice(0, 10);
+    updated.leaseMonths = months;
+    updated.leaseEnd = addMonths(signedOn, months);
+  }
+  return updated;
+}
+
 // A released item can come back on a brand new lease, history intact.
 // The extra `reLease` flag on the renewal entry is additive (valid when absent).
 export function reLease(item, { months, why }, today) {
