@@ -5,6 +5,9 @@
 
 import { todayISO, daysBetween } from "./engine.js";
 
+// Bumping this without a migration wipes existing data: load() treats a
+// version mismatch as unreadable and silently returns freshData(). Add a
+// migration from every older version first.
 export const SCHEMA_VERSION = 1;
 
 const DATA_KEY = "somedayLease.data";
