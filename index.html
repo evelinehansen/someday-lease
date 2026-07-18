@@ -16,17 +16,17 @@
         <h1 class="app-title">Someday<span class="app-title-accent">Lease</span></h1>
         <div class="backup-controls">
           <span class="backup-age" id="backupAge"></span>
-          <button class="btn small" id="exportBtn">Export</button>
-          <button class="btn small" id="importBtn">Import</button>
+          <button class="btn" id="exportBtn">Export</button>
+          <button class="btn" id="importBtn">Import</button>
         </div>
       </div>
       <p class="carrying-line" id="carryingLine" hidden></p>
     </header>
 
-    <nav class="tabs" id="tabs" aria-label="Views">
-      <button class="tab" data-view="active">Somedays<span class="tab-badge" id="dueBadge" hidden></span></button>
-      <button class="tab" data-view="acted">Did it</button>
-      <button class="tab" data-view="released">Released</button>
+    <nav class="tabs" id="tabs" role="tablist" aria-label="Views">
+      <button class="tab" role="tab" aria-selected="true" data-view="active">Somedays<span class="tab-badge" id="dueBadge" hidden></span></button>
+      <button class="tab" role="tab" aria-selected="false" data-view="acted">Did it</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="released">Released</button>
     </nav>
 
     <div class="filter-row" id="filterRow" hidden></div>

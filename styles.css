@@ -111,7 +111,7 @@ body {
   transition: color 0.2s, border-color 0.2s;
 }
 .tab:hover { color: var(--ink); }
-.tab.active { color: var(--ink); border-bottom-color: var(--sage-deep); }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--sage-deep); }
 
 .tab-badge {
   background: var(--sage-deep); color: #FFFFFF;

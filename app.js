@@ -8,7 +8,16 @@ import {
 } from "./engine.js";
 import {
   load, save, exportFile, backupAgeText, lastBackup, parseImport, mergeItems,
+  onSaveFailure,
 } from "./storage.js";
+
+// If a save to browser storage fails (full quota, private browsing), the
+// change on screen was not actually kept. The action that just failed may
+// show its own cheerful toast right after, so wait one beat and then put
+// the failure message on top, and keep it up longer than a normal toast.
+onSaveFailure((message) => {
+  setTimeout(() => showToast(message, 8000), 0);
+});
 
 let data = load();
 let view = "active";        // "active" | "acted" | "released"
@@ -53,7 +62,7 @@ function render() {
   $("#carryingLine").hidden = !line;
 
   document.querySelectorAll(".tab").forEach((t) => {
-    t.classList.toggle("active", t.dataset.view === view);
+    t.setAttribute("aria-selected", t.dataset.view === view ? "true" : "false");
   });
 
   const dueCount = data.items.filter((i) => isUpForRenewal(i, today)).length;
@@ -681,7 +690,7 @@ function applyImport(items, mode) {
 // ---------- toast ----------
 
 let toastTimer = null;
-function showToast(text) {
+function showToast(text, showForMs = 3400) {
   const toast = $("#toast");
   toast.textContent = text;
   toast.hidden = false;
@@ -690,7 +699,7 @@ function showToast(text) {
   toastTimer = setTimeout(() => {
     toast.classList.remove("show");
     setTimeout(() => { toast.hidden = true; }, 300);
-  }, 3400);
+  }, showForMs);
 }
 
 // ---------- global wiring ----------
