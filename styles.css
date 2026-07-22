@@ -55,12 +55,11 @@ body {
 .backup-age { font-size: 0.85rem; color: var(--ink-soft); margin-right: 0.25rem; }
 
 .carrying-line {
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: 1.4rem;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
   line-height: 1.35;
-  margin-top: 0.75rem;
-  max-width: 34ch;
+  margin-top: 2rem;
+  text-align: center;
 }
 
 /* ---------- section headings (small caps) ---------- */
@@ -215,10 +214,6 @@ body {
   right: 1rem; bottom: calc(1.1rem + env(safe-area-inset-bottom));
   box-shadow: var(--shadow-big);
   font-size: 0.95rem; padding: 0.7rem 1.3rem;
-}
-@media (min-width: 760px) {
-  /* keep the button visually attached to the centered column */
-  .add-fab { right: calc(50vw - 320px + 1rem); }
 }
 
 /* ---------- panel: side panel on desktop, bottom sheet on mobile ---------- */
